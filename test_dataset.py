@@ -15,8 +15,10 @@ import utils
 class InpaintDataset(Dataset):
     def __init__(self, opt):
         self.opt = opt
-        self.imglist = sorted(utils.get_files(opt.baseroot), key=lambda d:int(d.split('/')[-1].split('.')[0]))
-        self.masklist = sorted(utils.get_files(opt.baseroot_mask), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        self.imglist = sorted(utils.get_files(opt.baseroot, test=True), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        self.masklist = sorted(utils.get_files(opt.baseroot_mask, test=True), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        # self.imglist = sorted(utils.get_files(opt.baseroot, test=True), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        # self.masklist = sorted(utils.get_files(opt.baseroot, mask=True), key=lambda d:int(d.split('/')[-1].split('.')[0]))
 
     def __len__(self):
         return len(self.imglist)

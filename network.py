@@ -160,7 +160,8 @@ class PatchDiscriminator(nn.Module):
 class PerceptualNet(nn.Module):
     def __init__(self):
         super(PerceptualNet, self).__init__()
-        block = [torchvision.models.vgg16(pretrained=True).features[:15].eval()]
+        # block = [torchvision.models.vgg16(pretrained=True).features[:15].eval()]
+        block = [torchvision.models.vgg16(weights=torchvision.models.VGG16_Weights.DEFAULT).features[:15].eval()]
         for p in block[0]:
             p.requires_grad = False
         self.block = torch.nn.ModuleList(block)

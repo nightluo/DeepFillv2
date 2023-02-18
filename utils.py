@@ -53,13 +53,43 @@ def savetxt(name, loss_log):
     np_loss_log = np.array(loss_log)
     np.savetxt(name, np_loss_log)
 
-def get_files(path):
+# def get_files(path):
+#     # read a folder, return the complete path
+#     ret = []
+#     for root, dirs, files in os.walk(path):
+#         for filespath in files:
+#             ret.append(os.path.join(root, filespath))
+#     return ret
+
+def get_files(root, test=False, mask=False):
     # read a folder, return the complete path
-    ret = []
-    for root, dirs, files in os.walk(path):
-        for filespath in files:
-            ret.append(os.path.join(root, filespath))
-    return ret
+    imgs = []
+    for i in os.listdir(root):
+        path = os.path.join(root, i)
+        if os.path.splitext(path)[1]==".png":
+            imgs.append(os.path.join(root, i))
+        # if os.path.splitext(path)[1]==".jpg":
+        #     imgs.append(os.path.join(root, i))
+
+    imgs_num = len(imgs)
+    print(f"num of imgs:{imgs_num}")
+    imgs_list = imgs
+    # if test:
+    #     # imgs_list = imgs[int(0.8 * imgs_num):] 
+    #     imgs_list = imgs
+    #     print(f"num of test_imgs:{len(imgs_list)}")
+    # elif mask:
+    #     imgs_list = imgs[int(0.8 * imgs_num):] 
+    #     # 需要做随机掩码再返回
+    #     """
+    #     针对 test_img 做随机掩码
+    #     """
+    #     print(f"num of test_imgs:{len(imgs_list)}")
+    # else:
+    #     imgs_list = imgs[:int(0.8 * imgs_num)] 
+    #     print(f"num of train_imgs:{len(imgs_list)}")
+
+    return imgs_list
 
 def get_names(path):
     # read a folder, return the image name

@@ -33,42 +33,17 @@ class InpaintDataset(Dataset):
         # set the different image size for each batch (data augmentation)
         if index % self.opt.batch_size == 0:
             SEED += 2
-        
+
         # 图像缩放
         img = cv2.resize(img, (512, 512))
         # 随机裁剪
         # img, height, width = self.random_crop(img, SEED)
         # 为保证铁路完整性，不做裁剪
         height, width = 512, 512
-        
+
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
-#         mask = torch.from_numpy(mask.astype(np.float32)).contiguous()
-#         mask = self.random_mask()[0]
         return img, height, width
 
-    def random_crop(self, img, seed):
-        # 随机裁剪 --> 随机缩放
-        # train_transform = transforms.Compose([
-        #     transforms.RandomHorizontalFlip(p=0.5),
-        #     transforms.RandomVerticalFlip(p=0.5),
-        # ]) 
-
-        width_list = [256, 320, 400, 480]
-        height_list = [256, 320, 400, 480]
-        random.seed(seed)
-        width = random.choice(width_list)
-        random.seed(seed+1)
-        height = random.choice(height_list)
-        
-        max_x = img.shape[1] - width
-        max_y = img.shape[0] - height
-
-        x = np.random.randint(0, max_x)
-        y = np.random.randint(0, max_y)
-        
-        crop = img[y: y + height, x: x + width]
-
-        return crop, height, width
 
     @staticmethod
     def random_ff_mask(shape, max_angle = 10, max_len = 40, max_width = 50, times = 15):
@@ -79,24 +54,18 @@ class InpaintDataset(Dataset):
         Returns:
             tuple: (top, left, height, width)
         """
-        # 绘制 free-from 的随机 mask
         height = shape[0]
         width = shape[1]
         mask = np.zeros((height, width), np.float32)
         times = np.random.randint(times-5, times)
         for i in range(times):
-            # 起始点
             start_x = np.random.randint(width)
             start_y = np.random.randint(height)
             for j in range(1 + np.random.randint(5)):
-                # 绘制线段的角度
                 angle = 0.01 + np.random.randint(max_angle)
                 if i % 2 == 0:
-                    # 绘制圆以作平滑
                     angle = 2 * 3.1415926 - angle
-                # 线段的长度
                 length = 10 + np.random.randint(max_len-20, max_len)
-                # 线段的宽度
                 brush_w = 5 + np.random.randint(max_width-30, max_width)
                 end_x = (start_x + length * np.sin(angle)).astype(np.int32)
                 end_y = (start_y + length * np.cos(angle)).astype(np.int32)
@@ -112,7 +81,6 @@ class InpaintDataset(Dataset):
         Returns:
             tuple: (top, left, height, width)
         """
-        # 绘制随机的矩形
         img_height = shape
         img_width = shape
         height = bbox_shape
@@ -136,7 +104,6 @@ class InpaintDataset(Dataset):
         Returns:
             tf.Tensor: output with shape [1, H, W, 1]
         """
-        # 根据随机矩形集合绘制 mask
         bboxs = []
         for i in range(times):
             bbox = self.random_bbox(shape, margin, bbox_shape)
@@ -151,7 +118,6 @@ class InpaintDataset(Dataset):
         return mask.reshape((1, ) + mask.shape).astype(np.float32)
     
     def random_mask(self):
-        # 混合 mask
         # rectangle mask
         image_height = 256
         image_width = 256
@@ -224,25 +190,3 @@ class InpaintDataset(Dataset):
 
         mask = torch.cat([rect_mask, brush_mask], dim=1).max(dim=1, keepdim=True)[0]
         return mask
-        
-class ValidationSet_with_Known_Mask(Dataset):
-    def __init__(self, opt):
-        self.opt = opt
-        self.namelist = utils.get_names(opt.baseroot)
-
-    def __len__(self):
-        return len(self.namelist)
-
-    def __getitem__(self, index):
-        # image
-        imgname = self.namelist[index]
-        imgpath = os.path.join(self.opt.baseroot, imgname)
-        img = cv2.imread(imgpath)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # mask
-        maskpath = os.path.join(self.opt.maskroot, imgname)
-        img = cv2.imread(maskpath, cv2.IMREAD_GRAYSCALE)
-        # the outputs are entire image and mask, respectively
-        img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
-        mask = torch.from_numpy(mask.astype(np.float32)).unsqueeze(0).contiguous()
-        return img, mask, imgname

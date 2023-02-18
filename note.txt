@@ -1,0 +1,15 @@
+run_train.sh
+line 2  --baseroot '../../inpainting/dataset/Places/img_set' \
+--baseroot '/mnt/data/luoyan/road/palces365/small/val_256/val_256' \
+--batch_size 2 \
+--epochs 41 \
+
+
+run_train.sh
+--baseroot './test_data/' \
+--baseroot_mask './test_data_mask/' \
+
+
+batch_size 4
+[Epoch 30/30] [Batch 137/138] [first Mask L1 Loss: 0.08622] [second Mask L1 Loss: 0.05239]
+[D Loss: 0.83670] [G Loss: 0.60649] [Perceptual Loss: 4.08250] time_left: 0:00:00.504111
