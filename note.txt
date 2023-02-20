@@ -7,6 +7,13 @@ line 2  --baseroot '../../inpainting/dataset/Places/img_set' \
 --save_path './models/models_track_v2(pre)' \
 --sample_path './samples/samples_track_v2(pre)' \
 
+--save_path './models/models_track_v1' \
+--sample_path './samples/samples_track_v1' \
+
+no_pretrain
+--save_path './models/models_track_v2' \
+--sample_path './samples/samples_track_v2' \
+
 run_train.sh
 --baseroot './test_data/' \
 --baseroot_mask './test_data_mask/' \

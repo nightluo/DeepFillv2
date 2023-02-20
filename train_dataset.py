@@ -36,8 +36,8 @@ class InpaintDataset(Dataset):
             SEED += 2
         
         # 图像缩放
-        img = cv2.resize(img, (360, 640))
-        # img = cv2.resize(img, (640, 360))
+        # img = cv2.resize(img, (360, 640))
+        img = cv2.resize(img, (640, 360))
 
         # 随机裁剪
         # img, height, width = self.random_crop(img, SEED)
@@ -99,7 +99,7 @@ class InpaintDataset(Dataset):
 
         # print(f"{box}, {type(box)}")
         box = box.numpy()
-        # print(f"{box}, {type(box)}")
+        # print(f"box: {box}")
 
         mask = np.zeros((height, width), np.float32)
         times = np.random.randint(times-5, times)
@@ -107,6 +107,10 @@ class InpaintDataset(Dataset):
             # 起始点
             start_x = np.random.randint(box[0], box[1])
             start_y = np.random.randint(box[2], box[3])
+            print(f"{i} time, x range {box[0]} to {box[1]}, x = {start_x}")
+            print(f"{i} time, y range {box[2]} to {box[3]}, y = {start_y}")
+            # start_y = np.random.randint(box[0], box[1])
+            # start_x = np.random.randint(box[2], box[3])
             for j in range(1 + np.random.randint(5)):
                 # 绘制线段的角度
                 angle = 0.01 + np.random.randint(max_angle)
@@ -114,20 +118,47 @@ class InpaintDataset(Dataset):
                     # 绘制圆以作平滑
                     angle = 2 * 3.1415926 - angle
                 # 线段的长度
-                length = 10 + np.random.randint(max_len-20, max_len)
+                # length = 10 + np.random.randint(max_len-20, max_len)
+                length = 20 + np.random.randint(max_len-20, max_len)
                 # 线段的宽度
                 brush_w = 5 + np.random.randint(max_width-30, max_width)
                 end_x = (start_x + length * np.sin(angle)).astype(np.int32)
-                if end_x > box[1]:
-                    end_x = box[0]
-                if end_x < box[0]:
-                    end_x = box[1]
+                # if end_x > box[1]:
+                #     end_x = box[0]
+                # if end_x < box[0]:
+                #     end_x = box[1]
+                # if end_x > box[3]:
+                #     end_x = box[2]
+                # if end_x < box[2]:
+                #     end_x = box[3]
                 end_y = (start_y + length * np.cos(angle)).astype(np.int32)
+                # if end_y > box[3]:
+                #     end_y = box[2]
+                # if end_y < box[2]:
+                #     end_y = box[3]
+                # if end_y > box[1]:
+                #     end_y = box[0]
+                # if end_y < box[0]:
+                #     end_y = box[1]
+
+                # if end_x > box[3]:
+                #     end_x = box[3]
+                # if end_x < box[2]:
+                #     end_x = box[2]
+                # if end_y > box[1]:
+                #     end_y = box[1]
+                # if end_y < box[0]:
+                #     end_y = box[0]
+                
+                if end_x > box[1]:
+                    end_x = box[1]
+                if end_x < box[0]:
+                    end_x = box[0]
                 if end_y > box[3]:
-                    end_y = box[2]
-                if end_y < box[2]:
                     end_y = box[3]
-                # print( (start_y, start_x), (end_y, end_x))
+                if end_y < box[2]:
+                    end_y = box[2]
+                print( (start_y, start_x), (end_y, end_x))
                 cv2.line(mask, (start_y, start_x), (end_y, end_x), 1.0, brush_w)
                 start_x, start_y = end_x, end_y
         # print(mask.shape)

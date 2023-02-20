@@ -1,7 +1,7 @@
 python3 train.py \
 --baseroot '/mnt/data/luoyan/road/track_v2/dataset' \
---save_path './models/models_track_v1' \
---sample_path './samples/samples_track_v1' \
+--save_path './models/models_track_v2' \
+--sample_path './samples/samples_track_v2' \
 --gpu_ids '2,3' \
 --gan_type 'WGAN' \
 --cudnn_benchmark True \

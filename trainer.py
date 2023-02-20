@@ -30,9 +30,9 @@ def WGAN_trainer(opt):
 
     # Build networks
     generator = utils.create_generator(opt)
-    generator.load_state_dict(torch.load('./pretrained_model/bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4.pth'))
+    # generator.load_state_dict(torch.load('./pretrained_model/bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4.pth'))
     discriminator = utils.create_discriminator(opt)
-    discriminator.load_state_dict(torch.load('./pretrained_model/val_deepfillv2_WGAN_D_epoch20_batchsize8.pth'))
+    # discriminator.load_state_dict(torch.load('./pretrained_model/val_deepfillv2_WGAN_D_epoch20_batchsize8.pth'))
     perceptualnet = utils.create_perceptualnet()
 
     # Loss functions
