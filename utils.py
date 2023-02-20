@@ -4,7 +4,7 @@ import cv2
 import torch
 import torch.nn as nn
 import torchvision as tv
-
+import json
 import network
 
 # ----------------------------------------
@@ -66,10 +66,10 @@ def get_files(root, test=False, mask=False):
     imgs = []
     for i in os.listdir(root):
         path = os.path.join(root, i)
-        # if os.path.splitext(path)[1]==".png":
-        #     imgs.append(os.path.join(root, i))
-        if os.path.splitext(path)[1]==".jpg":
+        if os.path.splitext(path)[1]==".png":
             imgs.append(os.path.join(root, i))
+        # if os.path.splitext(path)[1]==".jpg":
+        #     imgs.append(os.path.join(root, i))
 
     imgs_num = len(imgs)
     print(f"num of imgs:{imgs_num}")
@@ -90,6 +90,35 @@ def get_files(root, test=False, mask=False):
     #     print(f"num of train_imgs:{len(imgs_list)}")
 
     return imgs_list
+
+def get_boxs(root):
+    # read a folder, return the complete path
+    boxs = []
+    for i in os.listdir(root):
+        path = os.path.join(root, i)
+        if os.path.splitext(path)[1]==".json":
+            boxs.append(get_points(path))
+            # print(f"box:{get_points(path)}")
+    return boxs
+
+def get_points(path):
+    with open(path, 'r') as f_json:
+        json_data = json.load(f_json)
+        # print(f"json_data:{json_data}")
+        points_list = json_data['shapes'][0]['points']
+        w_list, h_list = [], []
+        for point in points_list:
+            w_list.append(int(point[0]/3))
+            h_list.append(int(point[1]/3))
+        w_list.sort()
+        h_list.sort()
+        
+        box = [w_list[0], w_list[-1], h_list[0], h_list[-1]]
+        # if len(box) != 4:
+        #     print(f"error box:{path}")
+        # print(f"box:{box}")
+    return box
+
 
 def get_names(path):
     # read a folder, return the image name
@@ -224,3 +253,7 @@ def reduce_sum(x, axis=None, keepdim=False):
     for i in sorted(axis, reverse=True):
         x = torch.sum(x, dim=i, keepdim=keepdim)
     return x
+
+
+# get_points("/mnt/data/luoyan/road/track_v2/dataset/43170112040A1B01.json")
+# get_boxs("/mnt/data/luoyan/road/track_v2/dataset")

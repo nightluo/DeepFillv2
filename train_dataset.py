@@ -21,6 +21,7 @@ class InpaintDataset(Dataset):
         assert opt.mask_type in ALLMASKTYPES
         self.opt = opt
         self.imglist = utils.get_files(opt.baseroot)
+        self.boxlist = utils.get_boxs(opt.baseroot)
 
     def __len__(self):
         return len(self.imglist)
@@ -35,16 +36,25 @@ class InpaintDataset(Dataset):
             SEED += 2
         
         # 图像缩放
-        # img = cv2.resize(img, (512, 512))
+        img = cv2.resize(img, (360, 640))
+        # img = cv2.resize(img, (640, 360))
+
         # 随机裁剪
-        img, height, width = self.random_crop(img, SEED)
+        # img, height, width = self.random_crop(img, SEED)
+
         # 为保证铁路完整性，不做裁剪
         # height, width = 512, 512
-        
+
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
 #         mask = torch.from_numpy(mask.astype(np.float32)).contiguous()
 #         mask = self.random_mask()[0]
-        return img, height, width
+        # name = self.imglist[index].split('/')[-1].split('.')[0]
+        box = torch.tensor(self.boxlist[index])
+        # print(f"box:{box}")
+        height = img.shape[1]
+        width = img.shape[2]
+        # print(f"information of img:{box}, {height}, {width}")
+        return img, height, width, box
 
     def random_crop(self, img, seed):
         # 随机裁剪 --> 随机缩放
@@ -71,7 +81,7 @@ class InpaintDataset(Dataset):
         return crop, height, width
 
     @staticmethod
-    def random_ff_mask(shape, max_angle = 10, max_len = 40, max_width = 50, times = 15):
+    def random_ff_mask(box, shape, max_angle = 10, max_len = 40, max_width = 50, times = 15):
         """Generate a random free form mask with configuration.
         Args:
             config: Config should have configuration including IMG_SHAPES,
@@ -79,15 +89,24 @@ class InpaintDataset(Dataset):
         Returns:
             tuple: (top, left, height, width)
         """
+        
+        # box = w_l, w_h, h_l, h_h        
         # 绘制 free-from 的随机 mask
         height = shape[0]
         width = shape[1]
+        # height = box[3]
+        # width = box[1]
+
+        # print(f"{box}, {type(box)}")
+        box = box.numpy()
+        # print(f"{box}, {type(box)}")
+
         mask = np.zeros((height, width), np.float32)
         times = np.random.randint(times-5, times)
         for i in range(times):
             # 起始点
-            start_x = np.random.randint(width)
-            start_y = np.random.randint(height)
+            start_x = np.random.randint(box[0], box[1])
+            start_y = np.random.randint(box[2], box[3])
             for j in range(1 + np.random.randint(5)):
                 # 绘制线段的角度
                 angle = 0.01 + np.random.randint(max_angle)
@@ -99,9 +118,20 @@ class InpaintDataset(Dataset):
                 # 线段的宽度
                 brush_w = 5 + np.random.randint(max_width-30, max_width)
                 end_x = (start_x + length * np.sin(angle)).astype(np.int32)
+                if end_x > box[1]:
+                    end_x = box[0]
+                if end_x < box[0]:
+                    end_x = box[1]
                 end_y = (start_y + length * np.cos(angle)).astype(np.int32)
+                if end_y > box[3]:
+                    end_y = box[2]
+                if end_y < box[2]:
+                    end_y = box[3]
+                # print( (start_y, start_x), (end_y, end_x))
                 cv2.line(mask, (start_y, start_x), (end_y, end_x), 1.0, brush_w)
                 start_x, start_y = end_x, end_y
+        # print(mask.shape)
+        # print(f"return {mask.reshape((1, ) + mask.shape).astype(np.float32).shape}")
         return mask.reshape((1, ) + mask.shape).astype(np.float32)
     
     

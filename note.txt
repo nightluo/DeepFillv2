@@ -4,6 +4,8 @@ line 2  --baseroot '../../inpainting/dataset/Places/img_set' \
 --batch_size 2 \
 --epochs 41 \
 
+--save_path './models/models_track_v2(pre)' \
+--sample_path './samples/samples_track_v2(pre)' \
 
 run_train.sh
 --baseroot './test_data/' \

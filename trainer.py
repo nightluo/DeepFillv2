@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
-
+import torchvision as tv
 import network
 import train_dataset
 import utils
@@ -30,7 +30,9 @@ def WGAN_trainer(opt):
 
     # Build networks
     generator = utils.create_generator(opt)
+    generator.load_state_dict(torch.load('./pretrained_model/bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4.pth'))
     discriminator = utils.create_discriminator(opt)
+    discriminator.load_state_dict(torch.load('./pretrained_model/val_deepfillv2_WGAN_D_epoch20_batchsize8.pth'))
     perceptualnet = utils.create_perceptualnet()
 
     # Loss functions
@@ -130,19 +132,30 @@ def WGAN_trainer(opt):
 
     # Training loop
     for epoch in range(opt.resume_epoch, opt.epochs):
-        for batch_idx, (img, height, width) in enumerate(dataloader):
-
+        for batch_idx, (img, height, width, box) in enumerate(dataloader):
+            # print(height, width, box)
             img = img.cuda()
+            # img_resize = tv.transforms.Resize((360, 640))
+            # img = img_resize(img)
+            # print(f"box{box}")
+            # print(img)
+            # batch_size 设置为 1 可先测试mask效果
             # set the same free form masks for each batch
             mask = torch.empty(img.shape[0], 1, img.shape[2], img.shape[3]).cuda()
+            # print(f"img.shape:{img.shape}, mask.shape:{mask.shape}")
             for i in range(opt.batch_size):
-                mask[i] = torch.from_numpy(train_dataset.InpaintDataset.random_ff_mask(
-                                                shape=(height[0], width[0])).astype(np.float32)).cuda()
+                mask[i] = torch.from_numpy(train_dataset.InpaintDataset.random_ff_mask(box[i], shape=(height[0], width[0])).astype(np.float32)).cuda()
+                # mask[i] = torch.from_numpy(train_dataset.InpaintDataset.random_ff_mask(box[i], shape=(int(height[0]/3), int(width[0]/3))).astype(np.float32)).cuda()
             
+            # print(f"img.shape:{img.shape}, mask.shape:{mask.shape}")
+
             # LSGAN vectors
             valid = Tensor(np.ones((img.shape[0], 1, height[0]//32, width[0]//32)))
             fake = Tensor(np.zeros((img.shape[0], 1, height[0]//32, width[0]//32)))
             zero = Tensor(np.zeros((img.shape[0], 1, height[0]//32, width[0]//32)))
+            # valid = Tensor(np.ones((img.shape[0], 1, height[0]//96, width[0]//96)))
+            # fake = Tensor(np.zeros((img.shape[0], 1, height[0]//96, width[0]//96)))
+            # zero = Tensor(np.zeros((img.shape[0], 1, height[0]//96, width[0]//96)))
 
             ### Train Discriminator
             optimizer_d.zero_grad()
