@@ -18,9 +18,9 @@ def WGAN_tester(opt):
     # Save the model if pre_train == True
     def load_model_generator(net, epoch, opt):
         
-        model_name = 'deepfillv2_WGAN_G_epoch40_batchsize4.pth'
-        # model_name = 'deepfillv2_WGAN_G_epoch20_batchsize8.pth'
-        # model_name = 'deepfillv2_WGAN_G_epoch1_batchsize8.pth'
+        # model_name = 'bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4.pth'
+        # model_name = 'val_deepfillv2_WGAN_G_epoch20_batchsize8.pth'
+        model_name = 'track_deepfillv2_WGAN_G_epoch20_batchsize8.pth'
         # model_name = 'deepfillv2_WGAN_G_epoch%d_batchsize%d.pth' % (epoch, 4)
         model_name = os.path.join('pretrained_model', model_name)
         pretrained_dict = torch.load(model_name)
@@ -31,9 +31,10 @@ def WGAN_tester(opt):
     # ----------------------------------------
 
     # configurations
-    results_path = './results/results_bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4' 
-    # results_path = './results/results_track_deepfillv2_WGAN_G_epoch20_batchsize8' 
-    # results_path = './results/results_val_deepfillv2_WGAN_G_epoch1_batchsize8' 
+    # results_path = './results/results_bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4' 
+    # results_path = './results/results_val_deepfillv2_WGAN_G_epoch20_batchsize8' 
+    results_path = './results/results_track_deepfillv2_WGAN_G_epoch20_batchsize8' 
+    
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
@@ -44,7 +45,13 @@ def WGAN_tester(opt):
     print('-------------------------Pretrained Model Loaded-------------------------')
 
     # To device
-    generator = generator.cuda()
+    if opt.multi_gpu == True:
+        generator = nn.DataParallel(generator)
+        generator = generator.cuda()
+    else:
+        generator = generator.cuda()
+
+    # generator = generator.cuda()
     
     # ----------------------------------------
     #       Initialize training dataset

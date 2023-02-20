@@ -1,14 +1,14 @@
 python3 train.py \
 --baseroot '/mnt/data/luoyan/road/palces365/small/val_256/val_256' \
---save_path './models/models_val-256' \
---sample_path './samples/samples_val_256' \
+--save_path './models/models_val_256_40' \
+--sample_path './samples/samples_val_256_40' \
 --gpu_ids '0,2,3' \
 --gan_type 'WGAN' \
 --cudnn_benchmark True \
 --checkpoint_interval 1 \
 --multi_gpu True \
 --load_name '' \
---epochs 20 \
+--epochs 40 \
 --batch_size 8 \
 --lr_g 1e-4 \
 --lr_d 1e-4 \

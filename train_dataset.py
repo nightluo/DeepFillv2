@@ -35,11 +35,11 @@ class InpaintDataset(Dataset):
             SEED += 2
         
         # 图像缩放
-        img = cv2.resize(img, (512, 512))
+        # img = cv2.resize(img, (512, 512))
         # 随机裁剪
-        # img, height, width = self.random_crop(img, SEED)
+        img, height, width = self.random_crop(img, SEED)
         # 为保证铁路完整性，不做裁剪
-        height, width = 512, 512
+        # height, width = 512, 512
         
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
 #         mask = torch.from_numpy(mask.astype(np.float32)).contiguous()

@@ -11,6 +11,7 @@ if __name__ == "__main__":
     parser.add_argument('--results_path', type = str, default = './results', help = 'testing samples path that is a folder')
     parser.add_argument('--gan_type', type = str, default = 'WGAN', help = 'the type of GAN for training')
     parser.add_argument('--gpu_ids', type = str, default = "0", help = 'gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+    parser.add_argument('--multi_gpu', type = bool, default = False, help = 'nn.Parallel needs or not')
     parser.add_argument('--cudnn_benchmark', type = bool, default = True, help = 'True for unchanged input data type')
     # Training parameters
     parser.add_argument('--epoch', type = int, default = 40, help = 'number of epochs of training')
@@ -34,6 +35,11 @@ if __name__ == "__main__":
     # ----------------------------------------
     #       Choose CUDA visible devices
     # ----------------------------------------
+    # if opt.multi_gpu == True:
+    #     os.environ["CUDA_VISIBLE_DEVICES"] = opt.gpu_ids
+    # else:
+    #     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = opt.gpu_ids
     
     # Enter main function
     import tester

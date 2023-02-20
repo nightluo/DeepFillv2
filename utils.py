@@ -66,10 +66,10 @@ def get_files(root, test=False, mask=False):
     imgs = []
     for i in os.listdir(root):
         path = os.path.join(root, i)
-        if os.path.splitext(path)[1]==".png":
-            imgs.append(os.path.join(root, i))
-        # if os.path.splitext(path)[1]==".jpg":
+        # if os.path.splitext(path)[1]==".png":
         #     imgs.append(os.path.join(root, i))
+        if os.path.splitext(path)[1]==".jpg":
+            imgs.append(os.path.join(root, i))
 
     imgs_num = len(imgs)
     print(f"num of imgs:{imgs_num}")
