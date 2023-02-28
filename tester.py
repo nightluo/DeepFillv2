@@ -17,7 +17,8 @@ def WGAN_tester(opt):
     
     # Save the model if pre_train == True
     def load_model_generator(net, epoch, opt):
-        model_name = 'track_v2_deepfillv2_WGAN_G_epoch20_batchsize2.pth'
+        model_name = 'track_v4_deepfillv2_WGAN_G_epoch40_batchsize4.pth'
+        # model_name = 'track_v2_deepfillv2_WGAN_G_epoch20_batchsize2.pth'
         # model_name = 'track_v1_deepfillv2_WGAN_G_epoch20_batchsize2.pth'
         # model_name = 'bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4.pth'
         # model_name = 'val_deepfillv2_WGAN_G_epoch20_batchsize8.pth'
@@ -32,7 +33,7 @@ def WGAN_tester(opt):
     # ----------------------------------------
 
     # configurations
-    results_path = './results/results_track_v2_deepfillv2_WGAN_G_epoch20_batchsize2'
+    results_path = './results/track_v4_deepfillv2_WGAN_G_epoch40_batchsize4'
     # results_path = './results/results_track_v1_deepfillv2_WGAN_G_epoch20_batchsize2'
     # results_path = './results/results_bigtrain_deepfillv2_WGAN_G_epoch40_batchsize4' 
     # results_path = './results/results_val_deepfillv2_WGAN_G_epoch20_batchsize8' 

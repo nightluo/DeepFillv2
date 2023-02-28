@@ -74,6 +74,7 @@ def get_files(root, test=False, mask=False):
     imgs_num = len(imgs)
     print(f"num of imgs:{imgs_num}")
     imgs_list = imgs
+    # print(f"imgs_list[1]:{imgs_list[1]}")
     # if test:
     #     # imgs_list = imgs[int(0.8 * imgs_num):] 
     #     imgs_list = imgs
@@ -91,7 +92,7 @@ def get_files(root, test=False, mask=False):
 
     return imgs_list
 
-def get_boxs(root):
+def get_boxs_list(root):
     # read a folder, return the complete path
     boxs = []
     for i in os.listdir(root):
@@ -100,6 +101,14 @@ def get_boxs(root):
             boxs.append(get_points(path))
             # print(f"box:{get_points(path)}")
     return boxs
+
+def get_boxs(path):
+    # read a folder, return the complete path
+    json_path = path + '.json'
+    # print(f"json_path:{json_path}")
+    # path = os.path.join(opt.baseroot, json_name)
+    box = get_points(json_path)
+    return box
 
 def get_points(path):
     with open(path, 'r') as f_json:

@@ -133,9 +133,10 @@ def WGAN_trainer(opt):
 
     # Training loop
     for epoch in range(opt.resume_epoch, opt.epochs):
-        for batch_idx, (img, height, width, box) in enumerate(dataloader):
+        for batch_idx, (img, height, width, box, img_name) in enumerate(dataloader):
             # print(height, width, box)
             img = img.cuda()
+            # print(f"img_name:{img_name}")
             # img_resize = tv.transforms.Resize((360, 640))
             # img = img_resize(img)
             # print(f"box{box}")
@@ -221,6 +222,13 @@ def WGAN_trainer(opt):
                 img_list = [img, mask, masked_img, first_out, second_out]
                 name_list = ['gt', 'mask', 'masked_img', 'first_out', 'second_out']
                 utils.save_sample_png(sample_folder = sample_folder, sample_name = 'epoch%d' % (epoch + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
+            
+            # if (batch_idx + 1) % 1 == 0:
+            #     img_list = [img, mask, masked_img, first_out, second_out]
+            #     name_list = ['gt', 'mask', 'masked_img', 'first_out', 'second_out']
+            #     utils.save_sample_png(sample_folder = sample_folder, sample_name = 'epoch%d' % (epoch + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
+            # print(f"save first image!")
+            # return 0
 
         # Learning rate decrease
         adjust_learning_rate(opt.lr_g, optimizer_g, (epoch + 1), opt)

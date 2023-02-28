@@ -2,14 +2,14 @@ python3 train.py \
 --baseroot '/mnt/data/luoyan/road/track_v2/dataset' \
 --save_path './models/models_track_v4' \
 --sample_path './samples/samples_track_v4' \
---gpu_ids '2,4,6' \
+--gpu_ids '4,5,6' \
 --gan_type 'WGAN' \
 --cudnn_benchmark True \
 --checkpoint_interval 1 \
 --multi_gpu True \
 --load_name '' \
 --epochs 40 \
---batch_size 2 \
+--batch_size 4 \
 --lr_g 1e-4 \
 --lr_d 1e-4 \
 --lambda_l1 10 \

@@ -21,7 +21,7 @@ class InpaintDataset(Dataset):
         assert opt.mask_type in ALLMASKTYPES
         self.opt = opt
         self.imglist = utils.get_files(opt.baseroot)
-        self.boxlist = utils.get_boxs(opt.baseroot)
+        # self.boxlist = utils.get_boxs(opt.baseroot)
 
     def __len__(self):
         return len(self.imglist)
@@ -29,6 +29,9 @@ class InpaintDataset(Dataset):
     def __getitem__(self, index):
         # image
         global SEED
+        img_name = self.imglist[index].split('/')[-1].split('.')[0]
+        # print(f"img:{self.imglist[index]}")
+        # print(f"img_name:{img_name}")
         img = cv2.imread(self.imglist[index])
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # set the different image size for each batch (data augmentation)
@@ -49,12 +52,13 @@ class InpaintDataset(Dataset):
 #         mask = torch.from_numpy(mask.astype(np.float32)).contiguous()
 #         mask = self.random_mask()[0]
         # name = self.imglist[index].split('/')[-1].split('.')[0]
-        box = torch.tensor(self.boxlist[index])
+        box = utils.get_boxs(self.imglist[index].split('.')[0])
+        box = torch.tensor(box)
         # print(f"box:{box}")
         height = img.shape[1]
         width = img.shape[2]
         # print(f"information of img:{box}, {height}, {width}")
-        return img, height, width, box
+        return img, height, width, box, img_name
 
     def random_crop(self, img, seed):
         # 随机裁剪 --> 随机缩放
@@ -81,7 +85,7 @@ class InpaintDataset(Dataset):
         return crop, height, width
 
     @staticmethod
-    def random_ff_mask(box, shape, max_angle = 10, max_len = 100, max_width = 50, times = 15):
+    def random_ff_mask(box, shape, max_angle = 10, max_len = 50, max_width = 20, times = 5):
         """Generate a random free form mask with configuration.
         Args:
             config: Config should have configuration including IMG_SHAPES,
@@ -94,16 +98,20 @@ class InpaintDataset(Dataset):
         # 绘制 free-from 的随机 mask
         height = shape[0]
         width = shape[1]
+        # print(f"height:{height}, width:{width}")
         # height = box[3]
         # width = box[1]
 
         # print(f"{box}, {type(box)}")
         box = box.numpy()
+        # print(f"box:{box}")
         # print(f"box: {box}")
 
         mask = np.zeros((height, width), np.float32)
         times = np.random.randint(times-5, times)
+        # times = 2
         for i in range(times):
+            # print(f"time:{i}")
             # 起始点
             # start_x = np.random.randint(box[0], box[1])
             # start_y = np.random.randint(box[2], box[3])
@@ -122,10 +130,11 @@ class InpaintDataset(Dataset):
                     # 绘制圆以作平滑
                     angle = 2 * 3.1415926 - angle
                 # 线段的长度
-                # length = 10 + np.random.randint(max_len-20, max_len)
                 length = 20 + np.random.randint(max_len-20, max_len)
+                # length = 20 + np.random.randint(max_len-20, max_len)
                 # 线段的宽度
-                brush_w = 5 + np.random.randint(max_width-30, max_width)
+                # brush_w = 5 + np.random.randint(max_width-30, max_width)
+                brush_w = 5 + np.random.randint(max_width-10, max_width)
                 end_x = (start_x + length * np.sin(angle)).astype(np.int32)
                 # if end_x > box[1]:
                 #     end_x = box[0]
