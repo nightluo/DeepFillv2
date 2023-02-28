@@ -81,7 +81,7 @@ class InpaintDataset(Dataset):
         return crop, height, width
 
     @staticmethod
-    def random_ff_mask(box, shape, max_angle = 10, max_len = 40, max_width = 50, times = 15):
+    def random_ff_mask(box, shape, max_angle = 10, max_len = 100, max_width = 50, times = 15):
         """Generate a random free form mask with configuration.
         Args:
             config: Config should have configuration including IMG_SHAPES,
@@ -105,12 +105,16 @@ class InpaintDataset(Dataset):
         times = np.random.randint(times-5, times)
         for i in range(times):
             # 起始点
-            start_x = np.random.randint(box[0], box[1])
-            start_y = np.random.randint(box[2], box[3])
-            print(f"{i} time, x range {box[0]} to {box[1]}, x = {start_x}")
-            print(f"{i} time, y range {box[2]} to {box[3]}, y = {start_y}")
-            # start_y = np.random.randint(box[0], box[1])
-            # start_x = np.random.randint(box[2], box[3])
+            # start_x = np.random.randint(box[0], box[1])
+            # start_y = np.random.randint(box[2], box[3])
+            # print(f"{i} time, x range {box[0]} to {box[1]}, x = {start_x}")
+            # print(f"{i} time, y range {box[2]} to {box[3]}, y = {start_y}")
+
+            start_y = np.random.randint(box[0], box[1])
+            start_x = np.random.randint(box[2], box[3])
+            
+            # start_y = (box[0] + box[1]) // 2
+            # start_x = (box[2] + box[3]) // 2
             for j in range(1 + np.random.randint(5)):
                 # 绘制线段的角度
                 angle = 0.01 + np.random.randint(max_angle)
@@ -141,24 +145,24 @@ class InpaintDataset(Dataset):
                 # if end_y < box[0]:
                 #     end_y = box[1]
 
-                # if end_x > box[3]:
-                #     end_x = box[3]
-                # if end_x < box[2]:
-                #     end_x = box[2]
-                # if end_y > box[1]:
-                #     end_y = box[1]
-                # if end_y < box[0]:
-                #     end_y = box[0]
+                if end_x > box[3]:
+                    end_x = box[3]
+                if end_x < box[2]:
+                    end_x = box[2]
+                if end_y > box[1]:
+                    end_y = box[1]
+                if end_y < box[0]:
+                    end_y = box[0]
                 
-                if end_x > box[1]:
-                    end_x = box[1]
-                if end_x < box[0]:
-                    end_x = box[0]
-                if end_y > box[3]:
-                    end_y = box[3]
-                if end_y < box[2]:
-                    end_y = box[2]
-                print( (start_y, start_x), (end_y, end_x))
+                # if end_x > box[1]:
+                #     end_x = box[1]
+                # if end_x < box[0]:
+                #     end_x = box[0]
+                # if end_y > box[3]:
+                #     end_y = box[3]
+                # if end_y < box[2]:
+                #     end_y = box[2]
+                # print( (start_y, start_x), (end_y, end_x))
                 cv2.line(mask, (start_y, start_x), (end_y, end_x), 1.0, brush_w)
                 start_x, start_y = end_x, end_y
         # print(mask.shape)
